@@ -19,12 +19,12 @@ First, I will draw out the table as provided in Concrete Illustration from ASSIG
 
 ---
 
-## Entry 2 – [Date]: [Short description]
+## Entry 2 – [05/10/2026]: [Short description]
 
 > Required. At least one entry must describe a bug, wrong assumption, or design change
 > you encountered. Describe what went wrong and how you resolved it.
 
-_Your entry here._
+In the first implementation of function 'run_dijkstra', I did not utilize imported 'heapq', it caused the priority queue to not function as intended by popping the smallest weight first. I fixed this by using the pop function within 'heapq' and it fixed the code logic.
 
 ---
 

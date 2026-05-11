@@ -58,8 +58,18 @@ def select_sources(spawn, relics, exit_node):
 
     TODO
     """
-    pass
-
+    # Initialize empty list
+    nodes = []
+    # Insert spawn to the very begining
+    nodes.insert(0, spawn)
+    # For each node in relics...
+    for n in relics:
+        # add the node to the list of nodes
+        nodes.append(n)
+    nodes = list(set(nodes))
+    # Return the list
+    return nodes
+  
 
 def run_dijkstra(graph, source):
     """
@@ -77,7 +87,39 @@ def run_dijkstra(graph, source):
 
     TODO
     """
-    pass
+    # Initialize a key value pair of all distances (v, w)
+    distances = {}
+    # For each node in the graph, assign the distance to infinity, since they have not been discovered yet
+    for n in graph:
+        distances[n] = float('inf')
+    # Set the first/start node to 0
+    distances[source] = 0
+
+    # A priority queue, containing the cost, node tuples in it
+    pq = [(0, source)]
+    # Iterate while there is an availble node in priority queue
+    while pq:
+        # Pop the current smallest node in the priority queue
+        # Assign it to current distance and node u
+        cur_distance, u = heapq.heappop(pq)
+        # If the current distance is bigger than previously discovered distance for node u...
+        if cur_distance > distances[u]:
+            # Continue to above line and keep popping until a small current distance is found
+            continue
+        # Iterate through all neighbors of u
+        for v, w in graph.get(u,[]):
+            #Update the new distance, add w (weight) and current distance to get to u
+            distance = cur_distance + w
+            # if the updated distance is less than previous known value of distances
+            if distance < distances[v]:
+                # Update
+                distances[v] = distance
+                # push the new node v into the priority queue
+                heapq.heappush(pq, (distance,v))
+
+    # Return all distances
+    return distances
+
 
 
 def precompute_distances(graph, spawn, relics, exit_node):
@@ -97,7 +139,20 @@ def precompute_distances(graph, spawn, relics, exit_node):
 
     TODO
     """
-    pass
+    # First, select the nodes we want to compute every distance for
+    nodes = select_sources(spawn, relics, exit_node)
+    # Initialze key value pair for all the nodes
+    distance_dictionary = {}
+
+    # For each node in source nodes...
+    for n in nodes:
+        # Run the dijkstra algorithm with the given graph
+        distances_for_n = run_dijkstra(graph, n)
+        # Store the distances from the source node n in the key value pair for all distances
+        distance_dictionary[n] = distances_for_n
+    
+    # Return the dictionary table containing the precomputed distances from each node
+    return distance_dictionary
 
 
 # =============================================================================

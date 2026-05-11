@@ -33,10 +33,11 @@
 
 > List the source node types as a bullet list. For each, one-line reason.
 
-| Source Node Type | Why it is a source |
+| Starting Node | Why it is a source |
 |---|---|
-| _node type_ | _one-line reason_ |
-| _node type_ | _one-line reason_ |
+| start node (S) | It must find shortest distance to next chosen relic chamber |
+| relic chamber nodes (B,C,D) | It must find all distances to and from all relic chambers to find best overall order  |
+| end node (T) | It must be able to end at end node after going through all relic chambers |
 
 ### Part 2b: Distance Storage
 
@@ -44,20 +45,22 @@
 
 | Property | Your answer |
 |---|---|
-| Data structure name | |
-| What the keys represent | |
-| What the values represent | |
-| Lookup time complexity | |
-| Why O(1) lookup is possible | |
+| Data structure name | Dictionary/key value pairs |
+| What the keys represent | Node |
+| What the values represent | minimum distance to reach that node from source |
+| Lookup time complexity | O(1) |
+| Why O(1) lookup is possible | Dictionaru allows constant-time loop up to values since the length of data does not affect it  |
 
 ### Part 2c: Precomputation Complexity
 
 > State the total complexity and show the arithmetic. Two to three lines max.
 
-- **Number of Dijkstra runs:** _your answer_
-- **Cost per run:** _your answer_
-- **Total complexity:** _your answer_
-- **Justification (one line):** _your answer_
+- **Number of Dijkstra runs:** 1 + |R| = start node + set of all relics
+- **Cost per run:** O(E log V) since priority queue was used for V vertices and E Edges.
+- **Total complexity:** O(|R| * E log V) = O(n^2 log n)
+- **Justification (one line):** Dijkstra's algorithm is performed for each source node to calcualte all distances to targets.
+
+
 
 ---
 
