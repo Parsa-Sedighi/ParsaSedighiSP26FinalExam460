@@ -28,9 +28,9 @@ In the first implementation of function 'run_dijkstra', I did not utilize import
 
 ---
 
-## Entry 3 – [Date]: [Short description]
+## Entry 3 – [05/11/2026]: [Short description]
 
-_Your entry here._
+I revised my answer for part 1 due to wrong assumption. I originally beleieved that a simple shortest path would not work since it does not know distance to T, however it know shortest distance to T, but it would skip few relics. I now understand why relic to relic and final relic to node T distances matter. This way, all relics can be collected from start to end with lowest cost.
 
 ---
 

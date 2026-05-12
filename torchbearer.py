@@ -34,9 +34,10 @@ def explain_problem():
 
     TODO
     """
-    return "Because the path must not only start from S, but to also end at T with lowest cost.\n" \
-    "Decide what path to take in order to reach all of them, incurring the least cost.\n"\
-    "To search and find the order that has the least cost.\n"
+    return " Because it does not calculate the distances between relic chambers themselves and to the end node 'T'. It also skips a few chambers in the path to 'T'.\n" \
+    "Decide what path to take in order to reach all of them, while incurring the least cost.\n"\
+    "To search and find the order that has the least overall cost from S to T, with all relics collected in between.\n"
+
 
 
 # =============================================================================
@@ -95,7 +96,7 @@ def run_dijkstra(graph, source):
     # Set the first/start node to 0
     distances[source] = 0
 
-    # A priority queue, containing the cost, node tuples in it
+    # A priority queue, containing the cost, source node tuples in it
     pq = [(0, source)]
     # Iterate while there is an availble node in priority queue
     while pq:
@@ -169,7 +170,12 @@ def dijkstra_invariant_check():
 
     TODO
     """
-    return "TODO"
+    return "The computed and stored distance from the source node is absolute (Not subject to change) and the shortest possible path.\n"\
+    "The computed and stored distance from the source node is best currently found so far and can be subject to change.\n"\
+    "Before iteration, no node has been finalized. So the starting node S is 0, and all other are infinity as temporary values to be explored.\n "\
+    "During maintenance, noting nonnegative edge weights, the smallest potential distance popped from priority queue to reach target node u is the absolute shortest. Since all other nodes in priority queue are higher or same value and adding edges weight could only increase distance due to nonnegative property.\n" \
+    "Upon termination and when all nodes in priority queue are popped, the invariant has finalized all nodes absolute smallest distances. All infinity valued nodes are treated as unreachable from source node.\n"\
+    "Because the route planner relies on accurate distances between each and every node (S, relic chambers, T) to calculate total cost of sequences of routes, and to find the optimal shortest path."
 
 
 # =============================================================================

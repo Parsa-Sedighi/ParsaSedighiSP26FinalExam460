@@ -17,13 +17,13 @@
 > per question. Each bullet should be 1-2 sentences max.
 
 - **Why a single shortest-path run from S is not enough:**
- Because the path must not only start from S, but to also end at T with lowest cost.
+ Because it does not calculate the distances between relic chambers themselves and to the end node 'T'. It also skips a few chambers in the path to 'T'.
 
 - **What decision remains after all inter-location costs are known:**
- Decide what path to take in order to reach all of them, incurring the least cost.
+ Decide what path to take in order to reach all of them, while incurring the least cost.
 
 - **Why this requires a search over orders (one sentence):**
-  To search and find the order that has the least cost.
+  To search and find the order that has the least overall cost from S to T, with all relics collected in between.
 
 ---
 
@@ -75,29 +75,32 @@
 > Do not copy the invariant text from the spec.
 
 - **For nodes already finalized (in S):**
-  _Your answer here._
+  The computed and stored distance from the source node is absolute (Not subject to change) and the shortest possible path. 
 
 - **For nodes not yet finalized (not in S):**
-  _Your answer here._
+  The computed and stored distance from the source node is best currently found so far and can be subject to change.
 
 ### Part 3b: Why Each Phase Holds
 
 > One to two bullets per phase. Maintenance must mention nonnegative edge weights.
 
 - **Initialization : why the invariant holds before iteration 1:**
-  _Your answer here._
+  Before iteration, no node has been finalized.
+  So the starting node S is 0, and all other are infinity as temporary values to be explored.
 
 - **Maintenance : why finalizing the min-dist node is always correct:**
-  _Your answer here._
+  During maintenance, noting nonnegative edge weights, the smallest potential distance popped from priority queue to reach target node u is the absolute shortest.
+  Since all other nodes in priority queue are higher or same value and adding edges weight could only increase distance due to nonnegative property.
 
 - **Termination : what the invariant guarantees when the algorithm ends:**
-  _Your answer here._
+  Upon termination and when all nodes in priority queue are popped, the invariant has finalized all nodes absolute smallest distances.
+  All infinity valued nodes are treated as unreachable from source node.
 
 ### Part 3c: Why This Matters for the Route Planner
 
 > One sentence connecting correct distances to correct routing decisions.
 
-_Your answer here._
+Because the route planner relies on accurate distances between each and every node (S, relic chambers, T) to calculate total cost of sequences of routes, and to find the optimal shortest path. 
 
 ---
 
