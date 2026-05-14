@@ -34,10 +34,12 @@ def explain_problem():
 
     TODO
     """
-    return " Because it does not calculate the distances between relic chambers themselves and to the end node 'T'. It also skips a few chambers in the path to 'T'.\n" \
-    "Decide what path to take in order to reach all of them, while incurring the least cost.\n"\
-    "To search and find the order that has the least overall cost from S to T, with all relics collected in between.\n"
-
+   
+    return """
+Because it does not calculate the distances between relic chambers themselves and to the end node 'T'. It also skips a few chambers in the path to 'T'.
+Decide what path to take in order to reach all of them, while incurring the least cost.
+To search and find the order that has the least overall cost from S to T, with all relics collected in between.
+"""
 
 
 # =============================================================================
@@ -68,6 +70,8 @@ def select_sources(spawn, relics, exit_node):
         # add the node to the list of nodes
         nodes.append(n)
     nodes = list(set(nodes))
+    # Add exit node to the end of the list
+    nodes.append(exit_node)
     # Return the list
     return nodes
   
@@ -170,12 +174,22 @@ def dijkstra_invariant_check():
 
     TODO
     """
-    return "The computed and stored distance from the source node is absolute (Not subject to change) and the shortest possible path.\n"\
-    "The computed and stored distance from the source node is best currently found so far and can be subject to change.\n"\
-    "Before iteration, no node has been finalized. So the starting node S is 0, and all other are infinity as temporary values to be explored.\n "\
-    "During maintenance, noting nonnegative edge weights, the smallest potential distance popped from priority queue to reach target node u is the absolute shortest. Since all other nodes in priority queue are higher or same value and adding edges weight could only increase distance due to nonnegative property.\n" \
-    "Upon termination and when all nodes in priority queue are popped, the invariant has finalized all nodes absolute smallest distances. All infinity valued nodes are treated as unreachable from source node.\n"\
-    "Because the route planner relies on accurate distances between each and every node (S, relic chambers, T) to calculate total cost of sequences of routes, and to find the optimal shortest path."
+    return """
+The computed and stored distance from the source node is absolute (Not subject to change) and the shortest possible path.
+
+The computed and stored distance from the source node is best currently found so far and can be subject to change.
+
+Before iteration, no node has been finalized.
+So the starting node S is 0, and all other are infinity as temporary values to be explored.
+
+During maintenance, noting nonnegative edge weights, the smallest potential distance popped from priority queue to reach target node u is the absolute shortest.
+Since all other nodes in priority queue are higher or same value and adding edges weight could only increase distance due to nonnegative property.
+
+Upon termination and when all nodes in priority queue are popped, the invariant has finalized all node's absolute smallest distances.
+All infinity valued nodes are treated as unreachable from source node.
+
+Because the Route Planner relies on correct distances between each and every node (S, relic chambers, T) to calculate total cost of sequences of routes, and to find the optimal shortest path. 
+"""
 
 
 # =============================================================================
@@ -192,19 +206,22 @@ def explain_search():
 
     TODO
     """
-    answer = "Picking the immediate lowest cost relic (local optimum) chamber without considering how it may affect the total cost later on, forcing the torchberer into more expensive cost.\n" + \
-    "  | From \ To | B   | C   | D   | T   |\n"+\
-    "|-----------|-----|-----|-----|-----|\n"+\
-    "| S         | 1   | 2   | 2   | --  |\n"+\
-    "| B         | --  | 100 | 1   | 1   |\n"+\
-    "| C         | 1   | --  | 100 | 100 |\n"+\
-    "| D         | 1   | 1   | --  | 1   |\n"+\
-    "S -> B -> D -> C -> T with cost of 103\n"+\
-    "S -> C -> B -> D -> T with cost of 4\n"+\
-    "Greedy fails because it picks the current least expensive travel cost of S -> B instead of S -> C, an iversight which forces the remaining path to be expensive\n"+\
-    "Algorithm must explore every possible order of nodes that reach destination while visiting all relic chambers.\n"
+   
+    return """
+Picking the immediate lowest cost relic (local optimum) chamber without considering how it may affect the total cost later on, forcing the torchberer into more expensive cost.
 
-    return answer
+| From \ To | B   | C   | D   | T   |
+|-----------|-----|-----|-----|-----|
+| S         | 1   | 2   | 2   | --  |
+| B         | --  | 100 | 1   | 1   |
+| C         | 1   | --  | 100 | 100 |
+| D         | 1   | 1   | --  | 1   |
+
+Greedy: S -> B -> D -> C -> T with cost of 103
+Optimal: S -> C -> B -> D -> T with cost of 4
+Greedy fails because it picks the current least expensive travel cost of S -> B instead of S -> C, an oversight which forces the remaining path to be overall expensive.
+Algorithm must explore every possible order of nodes that reach destination while visiting all relic chambers.
+"""
 
 
 # =============================================================================
@@ -234,14 +251,14 @@ def find_optimal_route(dist_table, spawn, relics, exit_node):
     # Initialize optimal route placeholder to uncomputed fuel cost and empty route
     optimal_route = [float('inf'),[]]
 
-    # Data Structure of my choice: Stack
-    rel_collected = [] 
+    # Data Structure of my choice to keep track of relics visited: Stack
+    relics_visited_order = [] 
     # Set of all relics remaining to visit
     rel_remaining = set(relics)
 
-    # First call to _explore. Pass in precomputed dist_table(dijkstra), spawn node, 
+    # First call to _explore. Pass in precomputed dist_table(Dijkstra), spawn node, 
     # set of relics remainning, stack of rel_collected, accumulted current cost of 0, exit node, placeholder for optimal cost and route
-    _explore(dist_table, spawn, rel_remaining, rel_collected, 0, exit_node, optimal_route)
+    _explore(dist_table, spawn, rel_remaining, relics_visited_order, 0, exit_node, optimal_route)
 
     # Return cost at index 0, and optimal route graph at index
     return optimal_route[0], optimal_route[1]
@@ -288,13 +305,13 @@ def _explore(dist_table, current_loc, relics_remaining, relics_visited_order,
     # if the relics_remaining is empty, then all relics have been explored by now
     if not relics_remaining:
         # Assign the distance from current node to exit node
-        accum_cost = dist_table[current_loc][exit_node]
+        current_cost = dist_table[current_loc][exit_node]
         # Add stored cost so far from previous steps to new distance traveled
-        accum_cost = cost_so_far + accum_cost
+        current_cost = cost_so_far + current_cost
         # If the newly accumulated distance is less than what was previously stored...
-        if accum_cost < best[0]:
+        if current_cost < best[0]:
             # Assign the new best distance 
-            best[0] = accum_cost
+            best[0] = current_cost
             # Assign the order of relics in the order they were added
             best[1] = list(relics_visited_order) 
         # Return the function since variables were updated
@@ -303,13 +320,15 @@ def _explore(dist_table, current_loc, relics_remaining, relics_visited_order,
     # Non-base/recursive condition
     # For every remaining relic inside relics_remaining
     for relic in list(relics_remaining):
-        # Assign the pre-computed travel cost from currenr location to that relic
-        accum_cost = dist_table[current_loc][relic]
+        # Assign the pre-computed travel cost from current location to that relic
+        current_cost = dist_table[current_loc][relic]
+        # Remove it from the list of relics remaining since it was just visited.
         relics_remaining.remove(relic)
         # Update the stack of relics visited by appending it to the stack
         relics_visited_order.append(relic)
-        new_cost_so_far = cost_so_far + accum_cost
-        # Call recursive own function to explore different routes
+        # Attain new cost so far by adding the two distances together
+        new_cost_so_far = cost_so_far + current_cost
+        # Call own recursive function to explore different routes
         _explore(dist_table, relic, relics_remaining, relics_visited_order, new_cost_so_far, exit_node, best)
         
         # Remove the node from the stack of relics_visited
@@ -342,7 +361,7 @@ def solve(graph, spawn, relics, exit_node):
     TODO
     """
     # Putting the pieces together...
-    # Form the distance table by running dijkstra's algorith and computing distances from all nodes to one another
+    # Form the distance table by running dijkstra's algorithm and computing distances from all nodes to one another
     dist_table = precompute_distances(graph, spawn, relics, exit_node)
     # Find the optimal route between the spawn and exit_node, visiting/collecting all relics using the dist_table and _explore to do so.
     return find_optimal_route(dist_table, spawn, relics, exit_node)
