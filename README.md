@@ -111,17 +111,24 @@ Because the route planner relies on accurate distances between each and every no
 > State the failure mode. Then give a concrete counter-example using specific node names
 > or costs (you may use the illustration example from the spec). Three to five bullets.
 
-- **The failure mode:** _Your answer here._
-- **Counter-example setup:** _Your answer here._
-- **What greedy picks:** _Your answer here._
-- **What optimal picks:** _Your answer here._
-- **Why greedy loses:** _Your answer here._
+- **The failure mode:** Picking the immediate lowest cost relic (local optimum) chamber without considering how it may affect the total cost later on, forcing the torchberer into more expensive cost.
+- **Counter-example setup:** 
+  | From \ To | B   | C   | D   | T   |
+|-----------|-----|-----|-----|-----|
+| S         | 1   | 2   | 2   | --  |
+| B         | --  | 100 | 1   | 1   |
+| C         | 1   | --  | 100 | 100 |
+| D         | 1   | 1   | --  | 1   |
+- **What greedy picks:** S -> B -> D -> C -> T with cost of 103
+
+- **What optimal picks:** S -> C -> B -> D -> T with cost of 4
+- **Why greedy loses:** Greedy fails because it picks the current least expensive travel cost of S -> B instead of S -> C, an iversight which forces the remaining path to be expensive
 
 ### What the Algorithm Must Explore
 
 > One bullet. Must use the word "order."
 
-- _Your answer here._
+Algorithm must explore every possible order of nodes that reach destination while visiting all relic chambers.
 
 ---
 
@@ -134,9 +141,9 @@ Because the route planner relies on accurate distances between each and every no
 
 | Component | Variable name in code | Data type | Description |
 |---|---|---|---|
-| Current location | | | |
-| Relics already collected | | | |
-| Fuel cost so far | | | |
+| Current location | curr_location | node | Represents the current node the algorithm is currently on|
+| Relics already collected | rel_collected| Stack | Represents the list of relics collected in the order of most to least recently visited |
+| Fuel cost so far | accum_cost| integer | Represents the cumulative cost so far incurred from start to current node.
 
 ### Part 5b: Data Structure for Visited Relics
 
@@ -144,18 +151,18 @@ Because the route planner relies on accurate distances between each and every no
 
 | Property | Your answer |
 |---|---|
-| Data structure chosen | |
-| Operation: check if relic already collected | Time complexity: |
-| Operation: mark a relic as collected | Time complexity: |
-| Operation: unmark a relic (backtrack) | Time complexity: |
-| Why this structure fits | |
+| Data structure chosen | Stack|
+| Operation: check if relic already collected | Time complexity: O(n) |
+| Operation: mark a relic as collected | Time complexity: O(1) |
+| Operation: unmark a relic (backtrack) | Time complexity: O(1) |
+| Why this structure fits | Since Stack allows for last in, first out backtracking, the torchbearer can return to most recent relic chamber/node visited by popping stack |
 
 ### Part 5c: Worst-Case Search Space
 
 > Two bullets.
 
-- **Worst-case number of orders considered:** _Your answer (in terms of k)._
-- **Why:** _One-line justification._
+- **Worst-case number of orders considered:** _Your answer (in terms of k). O(k!)
+- **Why:** _One-line justification._ If there are k number of relics, with all having undirected paths, then the algorithm must find all k! unique orders of visiting them to find the minimum cost. 
 
 ---
 
@@ -165,23 +172,24 @@ Because the route planner relies on accurate distances between each and every no
 
 > Three bullets.
 
-- **What is tracked:** _Your answer here._
-- **When it is used:** _Your answer here._
-- **What it allows the algorithm to skip:** _Your answer here._
+- **What is tracked:** The accumulated cost so far incurred and the order of relics which has caused that cost.
+- **When it is used:** Whenever the _explore function is called to compare accumulated cost with what is stored in best[0]
+- **What it allows the algorithm to skip:** It allows the algorithm to skip exploring the rest of the routes that cannot be more optimal than the current distance. 
 
 ### Part 6b: Lower Bound Estimation
 
 > Three bullets.
 
-- **What information is available at the current state:** _Your answer here._
-- **What the lower bound accounts for:** _Your answer here._
-- **Why it never overestimates:** _Your answer here._
+- **What information is available at the current state:** At the current state, the final location exit_node (exit_node), updated distances (dist_table), current location (curr_relic), and relics to visit (relics_remaining) are available.
+- **What the lower bound accounts for:** The optimum cost to traverse from a current relic chamber to another, and also from relic to exit. 
+- **Why it never overestimates:** Because it uses distances computed by Dijkstra's algorithm which are shortest distances between the nodes, therfore it does not overestimated.
 
 ### Part 6c: Pruning Correctness
 
 > One to two bullets. Explain why pruning is safe.
 
-- _Your answer here._
+In this case of non-negative, weighted and directed graph, the cost incurred can only increase or remain the same.
+If a distance/cost already is bigger or equal to value stored in best, then there is no way for it to be optimal.
 
 ---
 

@@ -192,7 +192,19 @@ def explain_search():
 
     TODO
     """
-    return "TODO"
+    answer = "Picking the immediate lowest cost relic (local optimum) chamber without considering how it may affect the total cost later on, forcing the torchberer into more expensive cost.\n" + \
+    "  | From \ To | B   | C   | D   | T   |\n"+\
+    "|-----------|-----|-----|-----|-----|\n"+\
+    "| S         | 1   | 2   | 2   | --  |\n"+\
+    "| B         | --  | 100 | 1   | 1   |\n"+\
+    "| C         | 1   | --  | 100 | 100 |\n"+\
+    "| D         | 1   | 1   | --  | 1   |\n"+\
+    "S -> B -> D -> C -> T with cost of 103\n"+\
+    "S -> C -> B -> D -> T with cost of 4\n"+\
+    "Greedy fails because it picks the current least expensive travel cost of S -> B instead of S -> C, an iversight which forces the remaining path to be expensive\n"+\
+    "Algorithm must explore every possible order of nodes that reach destination while visiting all relic chambers.\n"
+
+    return answer
 
 
 # =============================================================================
@@ -219,7 +231,21 @@ def find_optimal_route(dist_table, spawn, relics, exit_node):
 
     TODO
     """
-    pass
+    # Initialize optimal route placeholder to uncomputed fuel cost and empty route
+    optimal_route = [float('inf'),[]]
+
+    # Data Structure of my choice: Stack
+    rel_collected = [] 
+    # Set of all relics remaining to visit
+    rel_remaining = set(relics)
+
+    # First call to _explore. Pass in precomputed dist_table(dijkstra), spawn node, 
+    # set of relics remainning, stack of rel_collected, accumulted current cost of 0, exit node, placeholder for optimal cost and route
+    _explore(dist_table, spawn, rel_remaining, rel_collected, 0, exit_node, optimal_route)
+
+    # Return cost at index 0, and optimal route graph at index
+    return optimal_route[0], optimal_route[1]
+
 
 
 def _explore(dist_table, current_loc, relics_remaining, relics_visited_order,
@@ -251,7 +277,47 @@ def _explore(dist_table, current_loc, relics_remaining, relics_visited_order,
     explaining why it is safe (cannot skip the optimal solution).
     This comment is graded.
     """
-    pass
+    # Pruning condition
+    # The prunning is safe because it rejects further branching if the cost incurred so far is equal to or bigger...
+    # ...than what is already stored in best. Knowing that global optimal solution can not be achieved further down the line...
+    #...since it is a non-negative, directed, weighted graph.
+    if best[0] <= cost_so_far:
+        return
+    
+    # Base condition
+    # if the relics_remaining is empty, then all relics have been explored by now
+    if not relics_remaining:
+        # Assign the distance from current node to exit node
+        accum_cost = dist_table[current_loc][exit_node]
+        # Add stored cost so far from previous steps to new distance traveled
+        accum_cost = cost_so_far + accum_cost
+        # If the newly accumulated distance is less than what was previously stored...
+        if accum_cost < best[0]:
+            # Assign the new best distance 
+            best[0] = accum_cost
+            # Assign the order of relics in the order they were added
+            best[1] = list(relics_visited_order) 
+        # Return the function since variables were updated
+        return
+    
+    # Non-base/recursive condition
+    # For every remaining relic inside relics_remaining
+    for relic in list(relics_remaining):
+        # Assign the pre-computed travel cost from currenr location to that relic
+        accum_cost = dist_table[current_loc][relic]
+        relics_remaining.remove(relic)
+        # Update the stack of relics visited by appending it to the stack
+        relics_visited_order.append(relic)
+        new_cost_so_far = cost_so_far + accum_cost
+        # Call recursive own function to explore different routes
+        _explore(dist_table, relic, relics_remaining, relics_visited_order, new_cost_so_far, exit_node, best)
+        
+        # Remove the node from the stack of relics_visited
+        relics_visited_order.pop()
+        # Add the node to remaining relics to be visited
+        relics_remaining.add(relic)
+
+    
 
 
 # =============================================================================
@@ -275,7 +341,11 @@ def solve(graph, spawn, relics, exit_node):
 
     TODO
     """
-    pass
+    # Putting the pieces together...
+    # Form the distance table by running dijkstra's algorith and computing distances from all nodes to one another
+    dist_table = precompute_distances(graph, spawn, relics, exit_node)
+    # Find the optimal route between the spawn and exit_node, visiting/collecting all relics using the dist_table and _explore to do so.
+    return find_optimal_route(dist_table, spawn, relics, exit_node)
 
 
 # =============================================================================

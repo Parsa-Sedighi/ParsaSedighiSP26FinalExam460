@@ -34,12 +34,13 @@ I revised my answer for part 1 due to wrong assumption. I originally beleieved t
 
 ---
 
-## Entry 4 – [Date]: Post-Implementation Reflection
+## Entry 4 – [05/13/2026]: Post-Implementation Reflection
 
 > Required. Written after your implementation is complete. Describe what you would
 > change or improve given more time.
 
-_Your entry here._
+After completing my implementation and passing all test cases, I would like to try different data structures as the placeholder for the relics collected. 
+I would like to see how changing the data structure used would require me to change the rest of the implementation.
 
 ---
 
